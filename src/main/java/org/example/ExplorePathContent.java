@@ -1,11 +1,13 @@
 package org.example;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
 
 public class ExplorePathContent {
     final private Path PATH;
@@ -14,53 +16,66 @@ public class ExplorePathContent {
         this.PATH = Paths.get(path);
     }
 
-    static private List<Path> mapPathsToFileNames(List<Path> paths) {
-        return paths.stream().map(Path::getFileName).collect(Collectors.toList());
-    }
-
-
-    static private String markFileOrDirectory(Path path) {
-        return path.toString() + (Files.isRegularFile(path) ? "-F" : "-D");
-    }
-
-    static private List<Path> getListedFolderContent(Path path) throws IOException {
-        return Files.list(path).collect(Collectors.toList());
-    }
 
     public Path getPATH() {
         return PATH;
     }
 
-
-    public void showOrderedContent() {
+    static private List<Path> getChildren(Path path) {
         try {
-            List<Path> paths = mapPathsToFileNames(getListedFolderContent(this.PATH));
-            paths.sort(null);
-            paths.forEach(System.out::println);
+            return Files.list(path).toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    public void showOrderedContent() {
+        List<Path> children = getChildren(this.PATH);
+        children.stream().map(Path::getFileName).sorted().forEach(System.out::println);
+    }
 
-    public static void showEntireTree(Path pathMother) {
+    static private String getTimeStampLastModification(Path path) {
+        try {
+            FileTime lastModifiedTime = Files.getLastModifiedTime(path);
+            return ", last modified: " + lastModifiedTime.toString().split("T")[0];
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static private String markFileOrDirectory(Path path) {
+        return (Files.isRegularFile(path) ? "-F" : "-D");
+    }
+
+    public static void showEntireTree(Path pathMother, Consumer<String> print) {
         if (Files.isDirectory(pathMother)) {
-            try {
-                List<Path> paths = getListedFolderContent(pathMother);
-                System.out.format("%s\\%n", pathMother.getFileName());
-                if (paths.isEmpty()) {
-                    System.out.println("Empty directory\n");
-
-                } else {
-                    mapPathsToFileNames(paths).forEach(System.out::println);
-                    System.out.println("\n");
-                }
-                for (Path path : paths) {
-                    showEntireTree(path);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            print.accept(pathMother.getFileName().toString() + "\\");
+            List<Path> paths = getChildren(pathMother);
+            if (paths.isEmpty()) {
+                print.accept("Empty directory\n");
+            } else {
+                paths.stream().sorted().forEach(path -> {
+                    print.accept(path.getFileName() + markFileOrDirectory(path) + getTimeStampLastModification(path));
+                });
+                print.accept("");
+            }
+            for (Path path : paths) {
+                showEntireTree(path, print);
             }
         }
     }
+
+    public static void showContentFile(Path path, Consumer<String> show) {
+        BufferedReader reader = InputManager.createBufferedReader(path);
+        try {
+            while (reader.readLine() != null) {
+                show.accept(reader.readLine());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+
 }
