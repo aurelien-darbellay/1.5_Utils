@@ -16,35 +16,13 @@ public class ExplorePathContent {
         this.PATH = Paths.get(path);
     }
 
-
     public Path getPATH() {
         return PATH;
-    }
-
-    static private List<Path> getChildren(Path path) {
-        try {
-            return Files.list(path).toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void showOrderedContent() {
         List<Path> children = getChildren(this.PATH);
         children.stream().map(Path::getFileName).sorted().forEach(System.out::println);
-    }
-
-    static private String getTimeStampLastModification(Path path) {
-        try {
-            FileTime lastModifiedTime = Files.getLastModifiedTime(path);
-            return ", last modified: " + lastModifiedTime.toString().split("T")[0];
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    static private String markFileOrDirectory(Path path) {
-        return (Files.isRegularFile(path) ? "-F" : "-D");
     }
 
     public static void showEntireTree(Path pathMother, Consumer<String> print) {
@@ -66,16 +44,34 @@ public class ExplorePathContent {
     }
 
     public static void showContentFile(Path path, Consumer<String> show) {
-        BufferedReader reader = InputManager.createBufferedReader(path);
-        try {
-            while (reader.readLine() != null) {
-                show.accept(reader.readLine());
+        try (BufferedReader reader = InputManager.createBufferedReader(path);) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                show.accept(line);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
+    static private List<Path> getChildren(Path path) {
+        try {
+            return Files.list(path).toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    static private String getTimeStampLastModification(Path path) {
+        try {
+            FileTime lastModifiedTime = Files.getLastModifiedTime(path);
+            return ", last modified: " + lastModifiedTime.toString().split("T")[0];
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static private String markFileOrDirectory(Path path) {
+        return (Files.isRegularFile(path) ? "-F" : "-D");
+    }
 }

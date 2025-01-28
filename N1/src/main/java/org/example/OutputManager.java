@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.function.Consumer;
 
 public class OutputManager {
+    
     static public Consumer<String> createConsolePrinter() {
         return new Consumer<String>() {
             @Override

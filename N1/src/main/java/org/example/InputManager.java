@@ -9,9 +9,9 @@ import java.nio.file.Path;
 
 public class InputManager {
     static public BufferedReader createBufferedReader(Path path) {
-        Charset charset = StandardCharsets.US_ASCII;
-        try (BufferedReader reader = Files.newBufferedReader(path, charset)) {
-            return reader;
+        Charset charset = StandardCharsets.UTF_8;
+        try {
+            return Files.newBufferedReader(path, charset);
         } catch (IOException e) {
             throw new RuntimeException("File not found", e);
         }

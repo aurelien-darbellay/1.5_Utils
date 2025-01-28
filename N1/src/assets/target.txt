@@ -1,0 +1,25 @@
+..\
+java-D, last modified: 2025-01-28
+resources-D, last modified: 2025-01-27
+
+java\
+org-D, last modified: 2025-01-27
+
+org\
+example-D, last modified: 2025-01-28
+
+example\
+ExplorePathContent.class-F, last modified: 2025-01-28
+ExplorePathContent.java-F, last modified: 2025-01-28
+InputManager.class-F, last modified: 2025-01-28
+InputManager.java-F, last modified: 2025-01-28
+Main.class-F, last modified: 2025-01-28
+Main.java-F, last modified: 2025-01-28
+OutputManager$1.class-F, last modified: 2025-01-28
+OutputManager$2.class-F, last modified: 2025-01-28
+OutputManager.class-F, last modified: 2025-01-28
+OutputManager.java-F, last modified: 2025-01-28
+
+resources\
+Empty directory
+
