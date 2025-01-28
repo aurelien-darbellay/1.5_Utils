@@ -1,6 +1,5 @@
 package org.example;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,11 +19,6 @@ public class ExplorePathContent {
         return PATH;
     }
 
-    public void showOrderedContent() {
-        List<Path> children = getChildren(this.PATH);
-        children.stream().map(Path::getFileName).sorted().forEach(System.out::println);
-    }
-
     public static void showEntireTree(Path pathMother, Consumer<String> print) {
         if (Files.isDirectory(pathMother)) {
             print.accept(pathMother.getFileName().toString() + "\\");
@@ -40,17 +34,6 @@ public class ExplorePathContent {
             for (Path path : paths) {
                 showEntireTree(path, print);
             }
-        }
-    }
-
-    public static void showContentFile(Path path, Consumer<String> show) {
-        try (BufferedReader reader = InputManager.createBufferedReader(path);) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                show.accept(line);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
